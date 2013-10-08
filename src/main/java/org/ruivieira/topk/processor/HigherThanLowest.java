@@ -27,8 +27,8 @@ public class HigherThanLowest {
     private List<Map> queryResult = new ArrayList<Map>();
 
     public static List<Map> process(Map<Integer,Object> input, Map params) {
-        System.out.println("[Called HigherThanLowest] Input: " + input);
-        System.out.println("[Called HigherThanLowest] Params: " + params);
+//        System.out.println("[Called HigherThanLowest] Input: " + input);
+//        System.out.println("[Called HigherThanLowest] Params: " + params);
         final List<Map> result = new ArrayList<Map>();
         final Integer operation = (Integer) params.get("operation");
 
@@ -41,17 +41,19 @@ public class HigherThanLowest {
         final String inverse = (String) params.get("inverseTableName");
         final String bucketName = (String) params.get("bucketName");
         final String bucketId = (String) params.get("bucketId");
-        final String forward = (String) params.get("tableName");
+//        final String forward = (String) params.get("tableName");
 
         final String id = (String) params.get("objectName");
         final String score = (String) params.get("scoreName");
 
-        System.out.println("[Called HigherThanLowest] Operation: " + operation);
-
-        System.out.println("[Called HigherThanLowest] Operation values: " + input.get(operation.toString()));
+//        System.out.println("[Called HigherThanLowest] Operation: " + operation);
+//
+//        System.out.println("[Called HigherThanLowest] Operation values: " + input.get(operation.toString()));
 
         final List<Map> queryResult = (List<Map>) input.get(operation.toString());
         final List<Pair> pairs = new ArrayList<Pair>();
+
+//        System.out.println("[Called HigherThanLowest] k: " + k + " query results: " + queryResult.size());
 
         for (Map m : queryResult) {
             final Map map = new HashMap();
@@ -59,12 +61,18 @@ public class HigherThanLowest {
             pairs.add(pair);
         }
 
-        final long lowestScore = Ordering.natural().greatestOf(pairs, k).get(k - 1).getScore();
+        long lowestScore;
+
+        if (queryResult.size()<k) {
+            lowestScore = Collections.min(pairs).getScore();
+        } else {
+            lowestScore = Ordering.natural().greatestOf(pairs, k).get(k - 1).getScore();
+        }
 
         final long Ti = Math.max(T, lowestScore);
 
-        System.out.println("[Called HigherThanLowest] Threshold:\t" + T);
-        System.out.println("[Called HigherThanLowest] Lowest:\t" + lowestScore);
+//        System.out.println("[Called HigherThanLowest] Threshold:\t" + T);
+//        System.out.println("[Called HigherThanLowest] Lowest:\t" + lowestScore);
 
         ClientState clientState = new ClientState();
         try {
@@ -79,7 +87,7 @@ public class HigherThanLowest {
         final String queryCQL = String.format("SELECT %s, %s FROM %s WHERE %s = '%s' AND %s > %d",
                 id, score, inverse, bucketName, bucketId, score, Ti);
 
-        System.out.println("[Called HigherThanLowest] Query:\t" + queryCQL);
+//        System.out.println("[Called HigherThanLowest] Query:\t" + queryCQL);
 
         ResultMessage rm = null;
         try {
